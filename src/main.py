@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
+import math
 
 HERE = Path(__file__).parent.resolve()
 
@@ -63,7 +64,9 @@ def McNemar_test(
     :param prediction_2:  the prediction results from model 2
     :return: the test statistic chi2_Mc
     """
-    chi2_Mc = np.random.uniform(0, 1)
+    B = np.count_nonzero(np.where((prediction_1 == labels) & (prediction_1 != prediction_2), 1, 0))
+    C = np.count_nonzero(np.where((prediction_2 == labels) & (prediction_1 != prediction_2), 1, 0))
+    chi2_Mc = (abs(B - C) - 1) ** 2 / (B + C)
     return chi2_Mc
 
 
@@ -74,7 +77,10 @@ def TwoMatchedSamplest_test(y1: np.ndarray, y2: np.ndarray) -> float:
     :param y2: runs of algorithm 2
     :return: the test statistic t-value
     """
-    t_value = np.random.uniform(0, 1)
+    d_line = np.sum(y1 - y2) / y1.size
+    inner_sum = np.sum((y1 - y2 - d_line) ** 2)
+    sigma_d1 = math.sqrt(1 / (y1.size - 1) * inner_sum)
+    t_value = math.sqrt(y1.size) * d_line / sigma_d1
     return t_value
 
 
@@ -86,11 +92,25 @@ def Friedman_test(errors: np.ndarray) -> Tuple[float, dict]:
     :return: FData_stats: the statistical data of the Friedan test data, containing anything
     you need to solve the `Nemenyi_test` and `box_plot` functions.
     """
-    chi2_F = np.random.uniform(0, 1)
+    ranks = []
+    for input in errors:
+        output = [0] * len(input)
+        for i, x in enumerate(sorted(range(len(input)), key=lambda y: input[y])):
+            output[x] = i + 1
+        ranks.append(output)
+    ranks_np = np.array(ranks)
 
+    # Now we compute the chi2_F by applying the formulas
+    n = errors.shape[0]
+    k = errors.shape[1]
+    r_j_bar = np.average(ranks_np, axis=0)
+    r_bar = np.average(ranks_np)
+    ss_total = n * np.sum((r_j_bar - r_bar) ** 2)
+    ss_error = 1 / (n * (k - 1)) * np.sum((ranks_np - r_bar) ** 2)
+    chi2_F = ss_total / ss_error
     FData_stats = {
-        "errors": errors,
-        "hello": "world",
+        'errors': errors,
+        'avg_ranks': r_j_bar
     }
     return chi2_F, FData_stats
 
@@ -101,7 +121,16 @@ def Nemenyi_test(fdata_stats: dict) -> np.ndarray:
     :param fdata_stats np.ndarray: the statistical data of the Friedan test data to be utilized in the post hoc problems
     :return: the test statisic Q value
     """
-    Q_value = np.empty_like([1])
+    alg_count = fdata_stats['errors'].shape[1]
+    datasets_count = fdata_stats['errors'].shape[0]
+    Q_value = np.zeros((alg_count, alg_count))
+    avg_ranks = fdata_stats['avg_ranks']
+
+    for i in range(alg_count):
+        for j in range(alg_count):
+            if j > i:
+                Q_value[i][j] = (avg_ranks[i] - avg_ranks[j]) / \
+                    (math.sqrt((alg_count * (alg_count + 1)) / (6 * datasets_count)))
     return Q_value
 
 
