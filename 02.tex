@@ -1,0 +1,164 @@
+\documentclass{exam}
+\usepackage{amsmath, amsfonts}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage[super]{nth}
+
+\DeclareMathOperator*{\argmin}{argmin}
+
+\usepackage[hyperfootnotes=false]{hyperref}
+
+\usepackage[usenames,dvipsnames]{color}
+\newcommand{\note}[1]{
+	\noindent~\\
+	\vspace{0.25cm}
+	\fcolorbox{Red}{Orange}{\parbox{0.99\textwidth}{#1\\}}
+	%{\parbox{0.99\textwidth}{#1\\}}
+	\vspace{0.25cm}
+}
+
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\lecture}{AutoML}
+\newcommand{\lecturelong}{Automated Machine Learning}
+\newcommand{\semester}{SS 2021}
+\newcommand{\assignment}[1]{\nth{#1} Assignment}
+\newcommand{\lectors}{M. Lindauer \& F. Hutter}
+\newcommand{\hide}[1]{}
+
+
+\newcommand{\gccs}{\paragraph{General constraints for code submissions}
+{
+\footnotesize{
+Please adhere to these rules to make our and your life easier! We will deduct points if your solution does not fulfill the following:
+    
+    \begin{itemize}
+    	\item If not stated otherwise, we will use Python $3.7$ and greater.
+        \item If not stated otherwise, we expect a Python script, which we will invoke exactly as stated on the exercise sheet.
+        \item Your solution exactly returns the required output (neither less nor more) -- you can implement a \texttt{--verbose} option to increase the verbosity level for developing.
+        \item Add comments and docstrings, so we can understand your solution.
+        \item (If applicable) The \texttt{README} describes how to install requirements or provides addition information.
+        \item (If applicable) Add required additional packages to \texttt{requirements.txt}. Explain in your \texttt{README} what this package does, why you use that package and provide a link to it's documentation or GitHub page.
+        \item (If applicable) All prepared unittests have to pass.
+        \item (If applicable) You can (and sometimes have to) reuse code from previous exercises.
+    \end{itemize}
+    \rule{\textwidth}{.5pt}
+    \smallskip\\
+    \noindent}}}
+
+%\renewcommand{\hide}[1]{#1}
+
+\qformat{\thequestion. \textbf{\thequestiontitle}\hfill[\thepoints]}
+\bonusqformat{\thequestion. \textbf{\thequestiontitle}\hfill[\thepoints]}
+
+\pagestyle{headandfoot}
+
+%%%%%% MODIFY FOR EACH SHEET!!!! %%%%%%
+\newcommand{\duedate}{29.04.21 (23:59)}
+\newcommand{\due}{{\bf This assignment is due on \duedate.} }
+\firstpageheader
+{Due: \duedate \\ Points: 16}
+{{\bf\lecture}\\ \assignment{2}}
+{\lectors\\ \semester}
+
+\runningheader
+{Due: \duedate}
+{\assignment{2}}
+{\semester}
+%%%%%% MODIFY FOR EACH SHEET!!!! %%%%%%
+
+\firstpagefooter
+{}
+{\thepage}
+{}
+
+\runningfooter
+{}
+{\thepage}
+{}
+
+\headrule
+\pointsinrightmargin
+\bracketedpoints
+\marginpointname{.pt}
+
+
+
+\begin{document}
+	\gccs
+The automated machine learning methods you will learn about in this course help you to improve your skill and knowledge for applying machine learning in practice. The goal of this first exercise is to set up teams and learn about git and the workflow for future exercises.\vspace*{5pt}
+\begin{questions}
+	\titledquestion{Form teams of up to $3$ students} [$0.5$]
+	Most exercises will require you to implement some of the techniques you learn during the course \footnote{We recommend you use anaconda to set up a virtual environment for the lecture, see \url{https://conda.io/projects/conda/en/latest/user-guide/getting-started.html\#managing-environments}}.
+	\emph{Git} is one of the most widely used \textbf{version control systems} and allows you to easily collaborate with others on code from the same repository.
+	
+    Exercises have to be handed in \emph{teams of up to $3$} students.
+    When you have found your partner, open the following link (which will be later posted in Mattermost), create a group (you will have to name the group yourself) and both join that group.
+    This will allow you to clone the template repository in which you can add your solutions to this exercise sheet.
+
+    \emph{Note 1:} If you have never worked with \emph{git} before we suggest you take a look at this simple guide \url{http://rogerdudler.github.io/git-guide/}.\\
+    \emph{Note 2:} Make sure you and your team-mate are happy with each other. GitHub Classroom does not allow to change your groups mid semester.
+	
+    \titledquestion{Get familiar with git and GitHub Classroom} [$0.5$]
+	To show that you are familiar with the standard git \emph{add}, \emph{commit}, \emph{push} steps add a file called \texttt{members.txt} to your repository.
+	The file should contain the names of all members in the following way:
+	\begin{verbatim}
+	member 1: name1
+	member 2: name2
+	member 3: name3
+	\end{verbatim}
+	
+	We make use of GitHub Classrooms autograde functionality. Essentially, for most exercise sheets we will require you to pass unit tests which are automatically evaluated whenever you push to GitHub.
+	To demonstrate this process, for this exercise we run a test that expects the above file to be present and to contain three lines as above (make sure to replace name1, name2 and name3. If your group has less than 3 students, just add any name you like).
+
+	You will be informed if the tests executed successfully or not.
+	(To run tests locally you can always use the provide Makefile via \texttt{make test})
+\end{questions}
+	\bigskip
+	Next, having learned about different ways to empirically evaluate the performances of algorithms and AutoML systems, in this exercise you will now implement some of these techniques. Add your code creating plots and outputting statistics to main.py (callable as python main.py).
+	
+	\bigskip
+	
+	
+	\noindent We provide a simple Makefile which you can use to install all packages listed in your requirements file (\texttt{make install}).
+	
+	
+	\begin{questions}
+		
+		
+		\titledquestion{McNemar Test}[3]
+		
+		Two models are trained to classify images of cats and dogs. The result is stored in \textit{MCTestData.csv} with $n=500$ images. The function \textit{load\_data\_MNTest()} loads the data as an $n\times 3$ \textit{numpy array}, where the first column represents the ground truth. The 2nd and the 3rd columns represent the output from model 1 and 2 respectively.
+		 
+		Implement a \textit{McNemer Test} to determine whether the two models perform equally well on the dataset. In your solution state what is $H_0, H_1$ and return $\chi^2$ for this evaluation.
+		
+		
+		\titledquestion{Two-Matched Samples t-Test}[3]
+		
+		\textit{TMStTestData.csv} contains \textit{error} values of two algorithms on $n=419$ datasets, the function \textit{load\_data\_TMStTest()} loads the data as an $n\times 2$ \textit{numpy array}.
+		
+		Implement a \textit{Two-Matched-Samples t-Test} to determine whether the two algorithms perform equally well on the dataset and return the test statistic $t$ value for this evaluation.
+		
+		\titledquestion{Friedman Test}[3]
+		
+		\textit{FTestData.csv} contains $error$ values of $k=5$ algorithms on $n=15$ datasets, the function \textit{load\_data\_FTest()} loads the data as an $n\times k$ \textit{numpy matrix} $Err$, where $Err_{ij}$ represents the error of the $j$th algorithm on the $i$th dataset.
+		
+		Implement a \textit{Friedman Test} to determine if all algorithms are equivalent in their performance and return $\chi_F^2$ for this evaluation.  If this hypothesis is not rejected, you can skip the next question. 
+		
+		\titledquestion{Post-hoc Nemenyi Test}[3]
+		Having found that all the algorithms are not ranked equally, now we need to utilize the \textit{Post-hoc Nemenyi Test} to find the best-performing algorithm.
+		
+		Compute the the test statistic for all the algorithms pairs $\{j_1,j_2\}$. The results should be stored in a upper triangular matrix $\mathbf{Q}$, where $Q_{m,n}$ is the $q$ value between the algorithms $j_m$ and $j_n$ 
+		
+		\titledquestion{Boxplots}[2]
+		Create a boxplot\footnote{using e.g. \url{https://matplotlib.org/api/_as_gen/matplotlib.pyplot.boxplot.html}} for error value of the algorithms which have the best and the worst average ranks stored in \textit{FTestData.csv}.
+		This exercise will not be automatically graded. To let us quickly grade your exercises please add your solutions to a PDF and upload that PDF to your repository. Further we expect all plots to have axes labels and a legend.
+				
+	
+	\titledquestion{Code Style}[1]
+	On every exercise sheet we will also make use of \textit{pycodestyle}\footnote{former pep8} to adhere to a common python standard. Your code will be automatically evaluated on every push and you will be informed if the test fails. To check it locally, first \textit{run pip install pycodestyle} and then \textit{run pycodestyle --max-line-length=120 src/} to check your source file folder. Alternatively run \textit{make check}
+	\end{questions}
+	
+	\textbf{This assignment is due on 29.04.21 (23:59).} Submit your solution for the tasks by uploading a PDF, a txt file and the codes to your groups repository. The PDF has to include the name of the submitter(s). Teams of at most 3 students are allowed.
+\end{document}

@@ -1,0 +1,65 @@
+{
+  "tests": [
+    {
+      "name": "test members",
+      "setup": "",
+      "run": "pytest tests -k 'test_members'",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 1
+    },
+    {
+      "name": "MCNemar Test",
+      "setup": "",
+      "run": "pytest tests -k 'test_mcnemar_test'",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 3
+    },
+    {
+      "name": "Two-Matched Samples t-Test",
+      "setup": "",
+      "run": "pytest tests -k 'test_two_matched_samples_test'",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 3
+    },
+    {
+      "name": "Friedman Test",
+      "setup": "",
+      "run": "pytest tests -k 'test_friedman'",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 3
+    },
+    {
+      "name": "Post-hoc Nemenyi Test",
+      "setup": "",
+      "run": "pytest tests -k 'test_nemenyi_test'",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 3
+    },
+    {
+      "name": "checkstyle",
+      "setup": "",
+      "run": "make check",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 1
+    }
+  ]
+}
+
